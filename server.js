@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
@@ -56,23 +56,23 @@ app.post("/api/otp/request", async (req, res) => {
             ? normalizedMobileNumber
             : `tel:${normalizedMobileNumber}`;
 
-        const payload = {
-            applicationId: APPLICATION_ID,
-            password: PASSWORD,
-            subscriberId: subscriberId,
-            applicationHash: applicationHash,
-            applicationMetaData: {
-                client: "M",
-                device: "Chrome on Windows",
-                os: "Windows 11",
-                appCode: "http://localhost:3000"
-            }
-        };
+  const payload = {
+    applicationId: APPLICATION_ID,
+    password: PASSWORD,
+    subscriberId,
+        applicationHash,
+        applicationMetaData: {
+            client: "MOBILEAPP",
+            device: req.headers["user-agent"] || "Node.js",
+            os: process.platform,
+            appCode: "http://localhost:3000"
+        }
+};
         console.log("\n========== OTP REQUEST ==========");
         console.log("Mobile Number:", mobileNumber);
         console.log("Application ID:", APPLICATION_ID);
         console.log("Sending request to IdeaMart...");
-
+        console.log("OTP metadata client:", payload.applicationMetaData.client);
         const response = await axios.post(
             `${IDEAMART_BASE_URL}/subscription/otp/request`,
             payload,
